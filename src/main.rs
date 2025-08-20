@@ -18,7 +18,6 @@ struct Args {
 fn main() {
     let args = Args::parse();
 
-    println!("Hello, world!");
-    ns_pdf_scanner(PathBuf::from(args.input)).unwrap();
+    println!("{:?}", ns_pdf_scanner(PathBuf::from(args.input)).unwrap());
     //    trip_filter::trip_filter();
 }
