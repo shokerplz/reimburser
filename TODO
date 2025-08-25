@@ -6,9 +6,10 @@ How the hell this will work:
 - 1 Scan PDF and get trips Vector
 - 2 Filter trips Vector start and end stations #DONE
 - 2.5 Filter trips with intermediate routes. So if first one was a start, then take next one from this station on the same day and check if it ends with provided end station, repeat until day ends. #DONE
-- 3 Filter trips only by workdays #WIP
-- 4 Summarize and output (by day, by method of transportation and total)
+- 3 Filter trips only by workdays #DONE
+- 4 Summarize and output (by day, by method of transportation and total) #DONE
 
+Basic functionality is implemented. Wow!
 
 trip_filter function should take vector of all trips NS + GVB, vector of stations Vec<&str> that are considered start and end and return vector of trips that are relevant to calculation #DONE
 
