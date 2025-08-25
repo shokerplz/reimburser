@@ -1,3 +1,5 @@
+use chrono::{Datelike, NaiveDate};
+
 use crate::data;
 
 enum Direction {
@@ -6,7 +8,19 @@ enum Direction {
     None,
 }
 
-pub fn trip_filter(
+// There's no single reason to test this imho
+pub fn trip_workday_filter(all_trips: Vec<data::Trip>) -> Vec<data::Trip> {
+    let mut result: Vec<data::Trip> = Vec::new();
+    for trip in all_trips {
+        if trip.date.weekday().number_from_monday() <= 5 {
+            result.push(trip);
+        }
+    }
+    result
+}
+
+// Input trips should be sorted by date. Exactly like in PDF from NS
+pub fn trip_station_filter(
     all_trips: Vec<data::Trip>,
     from: Vec<String>,
     to: Vec<String>,
@@ -15,8 +29,16 @@ pub fn trip_filter(
     let mut tmp_trips: Vec<data::Trip> = Vec::new();
     let mut in_chain = false;
     let mut direction = Direction::None;
-    for trip in all_trips {
+    let mut current_date: chrono::NaiveDate = NaiveDate::from_yo_opt(2025, 1).unwrap();
+    let mut index = 0;
+    while index < all_trips.len() {
+        let trip = &all_trips[index];
+        if trip.price == 0.0 {
+            index += 1;
+            continue;
+        }
         if !in_chain {
+            current_date = trip.date;
             if from.contains(&trip.from) && to.contains(&trip.to)
                 || from.contains(&trip.to) && to.contains(&trip.from)
             {
@@ -33,6 +55,11 @@ pub fn trip_filter(
                 in_chain = true;
             }
         } else {
+            if trip.date != current_date || tmp_trips.last().expect("Well, I don't know how tmp_trips can be empty here, but you achieved unachivable goal, congrats!").to != trip.from {
+                tmp_trips.clear();
+                in_chain = false;
+                continue;
+            }
             tmp_trips.push(trip.clone());
             match direction {
                 Direction::ToHome if from.contains(&trip.to) => {
@@ -48,6 +75,7 @@ pub fn trip_filter(
                 _ => {}
             }
         }
+        index += 1;
     }
     result
 }
@@ -57,34 +85,34 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_trip_filter_simple() {
+    fn test_trip_station_filter_simple() {
         let date = chrono::NaiveDate::from_ymd_opt(2025, 6, 24).unwrap();
 
         let all_trips = vec![
             data::Trip::new(
                 date,
-                "NS".into(),
+                Provider::NS,
                 "Hilversum".into(),
                 "Amsterdam Centraal".into(),
                 5.0,
             ), // match
             data::Trip::new(
                 date,
-                "NS".into(),
+                Provider::NS,
                 "Amsterdam Zuid".into(),
                 "Hilversum".into(),
                 5.0,
             ), // match
             data::Trip::new(
                 date,
-                "NS".into(),
+                Provider::NS,
                 "Hilversum".into(),
                 "Utrecht Centraal".into(),
                 5.0,
             ), // no match
             data::Trip::new(
                 date,
-                "NS".into(),
+                Provider::NS,
                 "Rotterdam".into(),
                 "Hilversum".into(),
                 5.0,
@@ -94,7 +122,7 @@ mod tests {
         let from_stations = vec!["Hilversum".into()];
         let to_stations = vec!["Amsterdam Centraal".into(), "Amsterdam Zuid".into()];
 
-        let filtered = trip_filter(all_trips, from_stations, to_stations);
+        let filtered = trip_station_filter(all_trips, from_stations, to_stations);
 
         assert_eq!(filtered.len(), 2);
         assert!(
@@ -116,35 +144,35 @@ mod tests {
         let all_trips = vec![
             data::Trip::new(
                 date,
-                "NS".into(),
+                Provider::NS,
                 "Hilversum".into(),
                 "Duivendrecht".into(),
                 3.0,
             ), // match
             data::Trip::new(
                 date,
-                "NS".into(),
+                Provider::NS,
                 "Duivendrecht".into(),
                 "Amsterdam Centraal".into(),
                 4.0,
             ), // match
             data::Trip::new(
                 date,
-                "NS".into(),
+                Provider::NS,
                 "Amsterdam Centraal".into(),
                 "Duivendrecht".into(),
                 4.0,
             ), // match
             data::Trip::new(
                 date,
-                "NS".into(),
+                Provider::NS,
                 "Duivendrecht".into(),
                 "Hilversum".into(),
                 3.0,
             ), // match
             data::Trip::new(
                 date,
-                "NS".into(),
+                Provider::NS,
                 "Utrecht Centraal".into(),
                 "Rotterdam".into(),
                 10.0,
@@ -154,7 +182,7 @@ mod tests {
         let from_stations = vec!["Hilversum".into()];
         let to_stations = vec!["Amsterdam Centraal".into()];
 
-        let filtered = trip_filter(all_trips, from_stations, to_stations);
+        let filtered = trip_station_filter(all_trips, from_stations, to_stations);
 
         assert_eq!(filtered.len(), 4);
 

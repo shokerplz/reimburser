@@ -26,7 +26,7 @@ pub fn ns_pdf_scanner(pdf: PathBuf) -> Result<(Vec<Trip>, Vec<Trip>)> {
     let mut gvb_trips: Vec<Trip> = Vec::new();
     let mut ns_trips: Vec<Trip> = Vec::new();
 
-    for (i, page) in doc.pages().iter().enumerate() {
+    for (_, page) in doc.pages().iter().enumerate() {
         if let Ok(text) = page.text() {
             for line in text.all().split("\n") {
                 if let Some(cap_ns) = re_ns.captures(&line) {
