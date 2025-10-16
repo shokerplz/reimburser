@@ -15,7 +15,7 @@ pub fn ns_pdf_scanner(pdf: PathBuf) -> Result<(Vec<Trip>, Vec<Trip>)> {
     let pdfium = Pdfium::default();
 
     let re_ns = Regex::new(
-        r"^(?P<date>\d{2}-\d{2}-\d{4})\s+NS\s+(?P<kenmerk>.+spits|.+weekend)\s+(?P<from_to>.+?)\s+(?P<class>\d+)\s+€\s*(?P<price>[\d\.,]+)\s*$",
+        r"^(?P<date>\d{2}-\d{2}-\d{4})\s+NS\s+(?P<kenmerk>.+spits|.+weekend|Treinreizen)\s+(?P<from_to>.+?)\s+(?P<class>\d+)\s+€\s*(?P<price>[\d\.,]+)\s*$",
     )?;
     let re_gvb = Regex::new(
         r"^(?P<date>\d{2}-\d{2}-\d{4})\s+GVB\s+(?P<kenmerk>Lijn(\s\d+)?)\s+(?P<from_to>.+?)\s+€\s*(?P<price>[\d\.,]+)\s*$",
