@@ -7,7 +7,12 @@ edition = "2024"
 anyhow = "1.0.99"
 chrono = { version = "0.4.41", features = ["serde"] }
 clap = { version = "4.5.45", features = ["derive"] }
-pdfium-render = {version = "0.8.35", features = ["static", "libstdc++"]}
 prettytable = "0.10.0"
 regex = "1.11.1"
+pdfium-render = { version = "0.8.35", features = ["static"] }
 
+[build-dependencies]
+bytes = "1.11.0"
+flate2 = "1.1.8"
+reqwest = { version = "0.13.1", features = ["blocking"] }
+tar = "0.4.44"

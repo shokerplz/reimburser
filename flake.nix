@@ -40,31 +40,23 @@
 
     devShells = forEachSupportedSystem ({pkgs}: {
       default = pkgs.mkShell {
-        packages = with pkgs;
-          [
-            rustToolchain
-            openssl
-            pkg-config
-            cargo-deny
-            cargo-edit
-            cargo-watch
-            rust-analyzer
-            rustup
-            wget
-            python3
-            ninja
-            git
-          ]
-          ++ pkgs.lib.optionals pkgs.stdenv.isDarwin [darwin.xcode_26 darwin.libcxx];
+        packages = with pkgs; [
+          rustToolchain
+          openssl
+          pkg-config
+          cargo-deny
+          cargo-edit
+          cargo-watch
+          rust-analyzer
+          rustup
+          wget
+          python3
+        ];
 
         env = {
           # Required by rust-analyzer
           RUST_SRC_PATH = "${pkgs.rustToolchain}/lib/rustlib/src/rust/library";
         };
-
-        shellHook = ''
-          export PDFIUM_STATIC_LIB_PATH="$PWD/lib"
-        '';
       };
     });
   };
