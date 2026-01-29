@@ -47,17 +47,21 @@
           cargo-edit
           cargo-watch
           rust-analyzer
-          pdfium-binaries
           rustup
           wget
+          python3
+          ninja
+          git
         ];
 
         env = {
           # Required by rust-analyzer
           RUST_SRC_PATH = "${pkgs.rustToolchain}/lib/rustlib/src/rust/library";
-          LD_LIBRARY_PATH = "$LD_LIBRARY_PATH:./lib";
-          DYLD_LIBRARY_PATH = "$LD_LIBRARY_PATH:./lib";
         };
+
+        shellHook = ''
+          export PDFIUM_STATIC_LIB_PATH="$PWD/lib"
+        '';
       };
     });
   };

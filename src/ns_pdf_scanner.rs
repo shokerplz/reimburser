@@ -12,7 +12,9 @@ use regex::Regex;
 use pdfium_render::prelude::*;
 
 pub fn ns_pdf_scanner(pdf: PathBuf) -> Result<(Vec<Trip>, Vec<Trip>)> {
-    let pdfium = Pdfium::default();
+    let pdfium = Pdfium::new(
+        Pdfium::bind_to_statically_linked_library().expect("Failed to bind to static pdfium"),
+    );
 
     let re_ns = Regex::new(
         r"^(?P<date>\d{2}-\d{2}-\d{4})\s+NS\s+(?P<kenmerk>.+spits|.+weekend|Treinreizen)\s+(?P<from_to>.+?)\s+(?P<class>\d+)\s+€\s*(?P<price>[\d\.,]+)\s*$",
