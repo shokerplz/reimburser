@@ -48,7 +48,17 @@ cd "$WORK_DIR/pdfium"
 
 mkdir -p out/Release
 
-cat > out/Release/args.gn <<'GN_ARGS'
+PLATFORM_ARGS=""
+if [[ "$(uname -s)" == "Darwin"]]; then
+PLATFORM_ARGS="
+use_custom_libcxx = true
+"
+else
+PLATFORM_ARGS="
+use_custom_libcxx = false
+"
+
+cat > out/Release/args.gn <<GN_ARGS
 is_debug = false
 is_component_build = false
 pdf_is_standalone = true
@@ -56,11 +66,11 @@ pdf_is_complete_lib = true
 pdf_enable_v8 = false
 pdf_enable_xfa = false
 pdf_bundle_freetype = true
-use_custom_libcxx = false
 use_sysroot = false
 use_glib = false
 is_clang = false
 treat_warnings_as_errors = false
+${PLATFORM_ARGS}
 GN_ARGS
 
 gn gen out/Release
@@ -73,6 +83,6 @@ ninja -C out/Release pdfium
 mkdir -p "$LIB_DIR"
 cp out/Release/obj/libpdfium.a "$LIB_DIR/"
 
-echo "e
+echo ""
 echo "==> Done! Static library installed to $STATIC_LIB"
 echo "    You can now build the project with: cargo build"

@@ -16,6 +16,7 @@
         f {
           pkgs = import inputs.nixpkgs {
             inherit system;
+            config.allowUnfree = true;
             overlays = [
               inputs.rust-overlay.overlays.default
               inputs.self.overlays.default
@@ -39,20 +40,22 @@
 
     devShells = forEachSupportedSystem ({pkgs}: {
       default = pkgs.mkShell {
-        packages = with pkgs; [
-          rustToolchain
-          openssl
-          pkg-config
-          cargo-deny
-          cargo-edit
-          cargo-watch
-          rust-analyzer
-          rustup
-          wget
-          python3
-          ninja
-          git
-        ];
+        packages = with pkgs;
+          [
+            rustToolchain
+            openssl
+            pkg-config
+            cargo-deny
+            cargo-edit
+            cargo-watch
+            rust-analyzer
+            rustup
+            wget
+            python3
+            ninja
+            git
+          ]
+          ++ pkgs.lib.optionals pkgs.stdenv.isDarwin [darwin.xcode_26 darwin.libcxx];
 
         env = {
           # Required by rust-analyzer
